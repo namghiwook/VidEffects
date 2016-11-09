@@ -11,7 +11,7 @@ import com.sherazkhilji.videffects.interfaces.ShaderInterface;
  *
  * @author sheraz.khilji
  */
-public class TintEffect implements ShaderInterface {
+public class TintEffect extends NormalEffect {
     private int mTint = 0xFF0000FF;
 
     /**

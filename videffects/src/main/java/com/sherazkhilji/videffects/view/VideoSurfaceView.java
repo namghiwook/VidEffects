@@ -2,8 +2,12 @@ package com.sherazkhilji.videffects.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
 import android.media.MediaPlayer;
+import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
@@ -13,12 +17,17 @@ import android.view.Surface;
 import android.widget.Toast;
 
 import com.sherazkhilji.videffects.NoEffect;
+import com.sherazkhilji.videffects.NormalEffect;
+import com.sherazkhilji.videffects.OpenGlUtils;
 import com.sherazkhilji.videffects.interfaces.ShaderInterface;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -32,12 +41,13 @@ import javax.microedition.khronos.opengles.GL10;
  */
 @SuppressLint("ViewConstructor")
 public class VideoSurfaceView extends GLSurfaceView {
+
     private static final String TAG = "VideoSurfaceView";
     private VideoRender mRenderer;
     private MediaPlayer mMediaPlayer = null;
     private static VideoSurfaceView mSurfaceView;
     private Context mContext;
-    private static ShaderInterface effect;
+    private static NormalEffect effect;
 
     public VideoSurfaceView(Context context) {
         super(context);
@@ -64,7 +74,7 @@ public class VideoSurfaceView extends GLSurfaceView {
      * @param mediaPlayer  instance of {@link MediaPlayer}
      * @param shaderEffect any effect that implements {@link ShaderInterface}
      */
-    public void init(MediaPlayer mediaPlayer, ShaderInterface shaderEffect) {
+    public void init(MediaPlayer mediaPlayer, NormalEffect shaderEffect) {
         if (mediaPlayer == null)
             Toast.makeText(mContext, "Set MediaPlayer before continuing",
                     Toast.LENGTH_LONG).show();
@@ -74,6 +84,10 @@ public class VideoSurfaceView extends GLSurfaceView {
             effect = new NoEffect();
         else
             effect = shaderEffect;
+
+//        getHolder().setFormat(PixelFormat.RGBA_8888);
+//        getHolder().setFormat(PixelFormat.RGBX_8888);
+//        getHolder().setFormat(PixelFormat.RGBA_4444);
     }
 
     @Override
@@ -86,6 +100,8 @@ public class VideoSurfaceView extends GLSurfaceView {
             @Override
             public void run() {
                 mRenderer.setMediaPlayer(mMediaPlayer);
+
+                mRenderer.initializeFilter(effect);
             }
         });
 
@@ -104,6 +120,7 @@ public class VideoSurfaceView extends GLSurfaceView {
                 // X, Y, Z, U, V
                 -1.0f, -1.0f, 0, 0.f, 0.f, 1.0f, -1.0f, 0, 1.f, 0.f, -1.0f,
                 1.0f, 0, 0.f, 1.f, 1.0f, 1.0f, 0, 1.f, 1.f,};
+
 
         private FloatBuffer mTriangleVertices;
 
@@ -128,9 +145,16 @@ public class VideoSurfaceView extends GLSurfaceView {
 
         private static int GL_TEXTURE_EXTERNAL_OES = 0x8D65;
 
+        private Context context;
         private MediaPlayer mMediaPlayer;
+        private NormalEffect mEffect;
+        private List<Integer> mResIds;
+
+        private int filterInputTextureUniform2;
+        public int filterSourceTexture2 = OpenGlUtils.NO_TEXTURE;
 
         public VideoRender(Context context) {
+            this.context = context;
             mTriangleVertices = ByteBuffer
                     .allocateDirect(
                             mTriangleVerticesData.length * FLOAT_SIZE_BYTES)
@@ -142,6 +166,90 @@ public class VideoSurfaceView extends GLSurfaceView {
 
         public void setMediaPlayer(MediaPlayer player) {
             mMediaPlayer = player;
+        }
+
+        public void initializeFilter(NormalEffect effect) {
+            mEffect = effect;
+            if (mEffect != null) {
+                mResIds = effect.getInputTextures();
+                filterInputTextureUniform2 = GLES20.glGetUniformLocation(mProgram, "inputImageTexture2");
+
+                initInputTexture();
+            }
+        }
+
+        private LinkedList<Runnable> mRunOnDraw = new LinkedList<Runnable>();
+
+        private void runOnDraw(Runnable runnable) {
+            synchronized (mRunOnDraw) {
+                mRunOnDraw.addLast(runnable);
+            }
+        }
+
+        protected void runPendingOnDrawTasks() {
+            while (!mRunOnDraw.isEmpty()) {
+                mRunOnDraw.removeFirst().run();
+            }
+        }
+
+        private Bitmap getBitmapFromRaw(Context context, int rawId) {
+            InputStream is = context.getResources().openRawResource(rawId);
+            Bitmap b = null;
+            try {
+                b = BitmapFactory.decodeStream(is);
+            } finally {
+                try {
+                    is.close();
+                } catch(IOException e) {
+                    // Ignore.
+                }
+            }
+            return b;
+        }
+
+        private void initInputTexture() {
+            if (mResIds == null) {
+                return;
+            }
+
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            options.inScaled = false;
+
+            if (mResIds.size() > 0) {
+                runOnDraw(new Runnable() {
+                    @Override
+                    public void run() {
+//                        Bitmap b = BitmapFactory.decodeResource(context.getResources(), mResIds.get(0), options);
+
+                        // get exact image
+                        InputStream is = context.getResources().openRawResource(mResIds.get(0));
+                        Bitmap b;
+                        try {
+                            b = BitmapFactory.decodeStream(is);
+
+                            Log.d("ghi", "bitmap size : " + b.getWidth() + " , " + b.getWidth());
+
+                        } finally {
+                            try {
+                                is.close();
+                            } catch(IOException e) {
+                                // Ignore.
+                            }
+                        }
+
+                        filterSourceTexture2 = OpenGlUtils.loadTexture(b, OpenGlUtils.NO_TEXTURE, true);
+                    }
+                });
+            }
+        }
+
+        protected void onDrawArraysPre() {
+            if (filterSourceTexture2 != OpenGlUtils.NO_TEXTURE) {
+                GLES20.glActiveTexture(GLES20.GL_TEXTURE3);
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, filterSourceTexture2);
+                GLES20.glUniform1i(filterInputTextureUniform2, 3);
+            }
         }
 
         @Override
@@ -161,6 +269,8 @@ public class VideoSurfaceView extends GLSurfaceView {
 
             GLES20.glUseProgram(mProgram);
             checkGlError("glUseProgram");
+
+            runPendingOnDrawTasks();
 
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
             GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mTextureID[0]);
@@ -185,6 +295,8 @@ public class VideoSurfaceView extends GLSurfaceView {
             GLES20.glUniformMatrix4fv(muMVPMatrixHandle, 1, false, mMVPMatrix,
                     0);
             GLES20.glUniformMatrix4fv(muSTMatrixHandle, 1, false, mSTMatrix, 0);
+
+            onDrawArraysPre();
 
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
             checkGlError("glDrawArrays");
@@ -244,12 +356,12 @@ public class VideoSurfaceView extends GLSurfaceView {
             GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mTextureID[0]);
             checkGlError("glBindTexture mTextureID");
 
-            // GLES20.glTexParameterf(GL_TEXTURE_EXTERNAL_OES,
-            // GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
-            // GLES20.glTexParameterf(GL_TEXTURE_EXTERNAL_OES,
-            // GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+
+            // you souldn't use GL_LINEAR for the LUT minification texture filter.
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
-                    GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+                    GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
                     GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,

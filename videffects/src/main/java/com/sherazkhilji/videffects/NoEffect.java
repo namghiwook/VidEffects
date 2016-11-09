@@ -10,7 +10,7 @@ import com.sherazkhilji.videffects.interfaces.ShaderInterface;
  *
  * @author sheraz.khilji
  */
-public class NoEffect implements ShaderInterface {
+public class NoEffect extends NormalEffect {
     /**
      * Initialize
      */

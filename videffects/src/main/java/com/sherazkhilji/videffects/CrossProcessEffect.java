@@ -11,7 +11,7 @@ import com.sherazkhilji.videffects.interfaces.ShaderInterface;
  *
  * @author sheraz.khilji
  */
-public class CrossProcessEffect implements ShaderInterface {
+public class CrossProcessEffect extends NormalEffect {
 
     /**
      * Initialize Effect

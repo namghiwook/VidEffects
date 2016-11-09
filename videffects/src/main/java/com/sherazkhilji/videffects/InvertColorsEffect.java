@@ -10,7 +10,7 @@ import com.sherazkhilji.videffects.interfaces.ShaderInterface;
  *
  * @author sheraz.khilji
  */
-public class InvertColorsEffect implements ShaderInterface {
+public class InvertColorsEffect extends NormalEffect {
     /**
      * Initialize Effect
      */

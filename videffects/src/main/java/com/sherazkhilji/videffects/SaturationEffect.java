@@ -10,7 +10,7 @@ import com.sherazkhilji.videffects.interfaces.ShaderInterface;
  *
  * @author sheraz.khilji
  */
-public class SaturationEffect implements ShaderInterface {
+public class SaturationEffect extends NormalEffect {
     private float scale = 0f;
 
     /**

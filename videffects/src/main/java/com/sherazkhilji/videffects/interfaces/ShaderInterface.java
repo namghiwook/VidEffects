@@ -2,6 +2,8 @@ package com.sherazkhilji.videffects.interfaces;
 
 import android.opengl.GLSurfaceView;
 
+import java.util.List;
+
 /**
  * An interface that every effect must implement so that there is a common
  * getShader method that every effect class is force to override
@@ -20,4 +22,5 @@ public interface ShaderInterface {
 	 */
 	public String getShader(GLSurfaceView mGlSurfaceView);
 
+	public List<Integer> getInputTextures();
 }

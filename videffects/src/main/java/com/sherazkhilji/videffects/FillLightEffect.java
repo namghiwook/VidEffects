@@ -10,7 +10,7 @@ import com.sherazkhilji.videffects.interfaces.ShaderInterface;
  *
  * @author sheraz.khilji
  */
-public class FillLightEffect implements ShaderInterface {
+public class FillLightEffect extends NormalEffect {
     private float strength = 0f;
 
     /**

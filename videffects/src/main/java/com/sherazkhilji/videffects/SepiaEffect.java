@@ -9,7 +9,7 @@ import com.sherazkhilji.videffects.interfaces.ShaderInterface;
  *
  * @author sheraz.khilji
  */
-public class SepiaEffect implements ShaderInterface {
+public class SepiaEffect extends NormalEffect {
     /**
      * Initialize Effect
      */

@@ -10,7 +10,7 @@ import com.sherazkhilji.videffects.interfaces.ShaderInterface;
  *
  * @author sheraz.khilji
  */
-public class BrightnessEffect implements ShaderInterface {
+public class BrightnessEffect extends NormalEffect {
     private float brightnessValue;
 
     /**

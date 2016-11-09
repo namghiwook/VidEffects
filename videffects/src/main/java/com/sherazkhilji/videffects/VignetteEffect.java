@@ -10,7 +10,7 @@ import com.sherazkhilji.videffects.interfaces.ShaderInterface;
  *
  * @author sheraz.khilji
  */
-public class VignetteEffect implements ShaderInterface {
+public class VignetteEffect extends NormalEffect {
     private int mWidth = 0;
     private int mHeight = 0;
     private float mScale = 0f;

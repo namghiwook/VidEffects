@@ -12,7 +12,7 @@ import java.util.Random;
  *
  * @author sheraz.khilji
  */
-public class DocumentaryEffect implements ShaderInterface {
+public class DocumentaryEffect extends NormalEffect {
     private int mWidth;
     private int mHeight;
     private Random mRandom;

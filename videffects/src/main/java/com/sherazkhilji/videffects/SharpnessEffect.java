@@ -9,7 +9,7 @@ import com.sherazkhilji.videffects.interfaces.ShaderInterface;
  *
  * @author sheraz.khilji
  */
-public class SharpnessEffect implements ShaderInterface {
+public class SharpnessEffect extends NormalEffect {
     private int mWidth;
     private int mHeight;
     private float scale = 0f;

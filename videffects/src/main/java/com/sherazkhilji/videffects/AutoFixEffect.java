@@ -9,7 +9,7 @@ import com.sherazkhilji.videffects.interfaces.ShaderInterface;
  *
  * @author sheraz.khilji
  */
-public class AutoFixEffect implements ShaderInterface {
+public class AutoFixEffect extends NormalEffect {
     private float scale;
 
     /**

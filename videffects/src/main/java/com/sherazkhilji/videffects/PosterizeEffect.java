@@ -10,7 +10,7 @@ import com.sherazkhilji.videffects.interfaces.ShaderInterface;
  *
  * @author sheraz.khilji
  */
-public class PosterizeEffect implements ShaderInterface {
+public class PosterizeEffect extends NormalEffect {
     /**
      * Initialize Effect
      */

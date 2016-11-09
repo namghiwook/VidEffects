@@ -9,7 +9,7 @@ import com.sherazkhilji.videffects.interfaces.ShaderInterface;
  *
  * @author sheraz.khilji
  */
-public class ContrastEffect implements ShaderInterface {
+public class ContrastEffect extends NormalEffect {
     private float contrast;
 
     /**

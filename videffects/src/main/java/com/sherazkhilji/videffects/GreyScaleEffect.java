@@ -10,7 +10,7 @@ import com.sherazkhilji.videffects.interfaces.ShaderInterface;
  *
  * @author sheraz.khilji
  */
-public class GreyScaleEffect implements ShaderInterface {
+public class GreyScaleEffect extends NormalEffect {
     /**
      * Initialize Effect
      */

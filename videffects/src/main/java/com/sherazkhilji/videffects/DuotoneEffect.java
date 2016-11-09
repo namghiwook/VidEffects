@@ -11,7 +11,7 @@ import com.sherazkhilji.videffects.interfaces.ShaderInterface;
  *
  * @author sheraz.khilji
  */
-public class DuotoneEffect implements ShaderInterface {
+public class DuotoneEffect extends NormalEffect {
     // Default values
     private int mFirstColor = Color.MAGENTA;
     private int mSecondColor = Color.YELLOW;

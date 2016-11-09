@@ -4,16 +4,24 @@ import android.opengl.GLSurfaceView;
 
 import com.sherazkhilji.videffects.interfaces.ShaderInterface;
 
+import java.text.Normalizer;
+import java.util.List;
+
 /**
  * Converts the video into black and white colors
  *
  * @author sheraz.khilji
  */
-public class BlackAndWhiteEffect implements ShaderInterface {
+public class BlackAndWhiteEffect extends NormalEffect {
     /**
      * Initialize Effect
      */
     public BlackAndWhiteEffect() {
+    }
+
+    @Override
+    public List<Integer> getInputTextures() {
+        return null;
     }
 
     @Override

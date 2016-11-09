@@ -9,7 +9,7 @@ import com.sherazkhilji.videffects.interfaces.ShaderInterface;
  *
  * @author sheraz.khilji
  */
-public class TemperatureEffect implements ShaderInterface {
+public class TemperatureEffect extends NormalEffect {
     private float scale = 0f;
 
     /**

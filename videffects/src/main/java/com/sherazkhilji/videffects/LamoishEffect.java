@@ -12,7 +12,7 @@ import java.util.Random;
  *
  * @author sheraz.khilji
  */
-public class LamoishEffect implements ShaderInterface {
+public class LamoishEffect extends NormalEffect {
     private int mWidth;
     private int mHeight;
     private Random mRandom;

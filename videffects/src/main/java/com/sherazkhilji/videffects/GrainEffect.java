@@ -12,7 +12,7 @@ import java.util.Random;
  *
  * @author sheraz.khilji
  */
-public class GrainEffect implements ShaderInterface {
+public class GrainEffect extends NormalEffect {
     private int mWidth;
     private int mHeight;
     private float strength;
