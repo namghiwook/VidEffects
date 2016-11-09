@@ -10,6 +10,8 @@ import android.util.Log;
 
 import com.sherazkhilji.sample.R;
 import com.sherazkhilji.videffects.DuotoneEffect;
+import com.sherazkhilji.videffects.LookupEffect;
+import com.sherazkhilji.videffects.NoEffect;
 import com.sherazkhilji.videffects.view.VideoSurfaceView;
 
 public class SamplePlayerActivity extends Activity {
@@ -40,6 +42,7 @@ public class SamplePlayerActivity extends Activity {
             AssetFileDescriptor afd = getAssets().openFd("sample.mp4");
             mMediaPlayer.setDataSource(afd.getFileDescriptor(),
                     afd.getStartOffset(), afd.getLength());
+            mMediaPlayer.setLooping(true);
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
         }
@@ -49,9 +52,11 @@ public class SamplePlayerActivity extends Activity {
         // or
         setContentView(R.layout.activity_sampleplayer);
         mVideoView = (VideoSurfaceView) findViewById(R.id.mVideoSurfaceView);
-        mVideoView.init(mMediaPlayer,
-                new DuotoneEffect(Color.parseColor("#3498DB"), Color.YELLOW));
+//        mVideoView.init(mMediaPlayer, new DuotoneEffect(Color.parseColor("#3498DB"), Color.YELLOW));
 
+        mVideoView.init(mMediaPlayer, new LookupEffect(this, R.raw.lookup_table));
+
+//        mVideoView.init(mMediaPlayer, null);
     }
 
     @Override
